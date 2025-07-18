@@ -93,9 +93,9 @@ export const CommunityOrb: React.FC<CommunityOrbProps> = ({ isDark }) => {
               <div className="space-y-3">
                 {['Discord', 'Telegram', 'Twitter'].map((platform) => {
                   const urls = {
-                    Discord: 'https://discord.gg/your-invite-code',
-                    Telegram: 'https://t.me/your-channel',
-                    Twitter: 'https://twitter.com/yourhandle',
+                    Discord: 'https://blockhore.vercel.app/404',
+                    Telegram: 'https://t.me/Blockhore',
+                    Twitter: 'https://x.com/Blockhore',
                   }
               
                   return (
