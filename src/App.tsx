@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sun, Moon, BookOpen, Users, Zap, Globe, Twitter, MessageCircle, Github, Linkedin, Instagram, Telegram } from 'lucide-react';
+import { Sun, Moon, BookOpen, Users, Zap, Globe, Twitter, MessageCircle, Github, Linkedin, Instagram, Send } from 'lucide-react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { LoadingScreen } from './components/LoadingScreen';
@@ -288,7 +288,7 @@ function App() {
                 <div className="flex justify-center gap-6">
                   {[
                     { icon: Twitter, label: 'Twitter' },
-                    { icon: Telegram, label: 'Telegram' },
+                    { icon: Send, label: 'Telegram' },
                     { icon: Instagram, label: 'Instagram' },
                     { icon: Github, label: 'Github' },
                     { icon: Linkedin, label: 'LinkedIn' }
