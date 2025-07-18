@@ -92,6 +92,13 @@ export const CommunityOrb: React.FC<CommunityOrbProps> = ({ isDark }) => {
 
               <div className="space-y-3">
                 {['Discord', 'Telegram', 'Twitter'].map((platform) => (
+                  const url = (
+                    Discord: 'https://blockhore.vercel.app/404',
+                    Telegram: 'https://t.me/Blockhore',
+                    Twitter: 'https://x.com/Blockhore',
+                    )
+
+                  return (
                   <button
                     key={platform}
                     className={`w-full p-3 rounded border-2 transition-all duration-200 ${
@@ -106,6 +113,7 @@ export const CommunityOrb: React.FC<CommunityOrbProps> = ({ isDark }) => {
                       {'>'} join.{platform.toLowerCase()}()
                     </span>
                   </button>
+                  )
                 ))}
               </div>
 
