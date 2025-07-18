@@ -8,6 +8,7 @@ import {
   Github, 
   Linkedin,
   Instagram,
+  Send,
   ExternalLink,
   ChevronUp
 } from 'lucide-react';
@@ -102,6 +103,14 @@ export const AboutPage: React.FC<AboutPageProps> = ({ isDark }) => {
       }
     }
   ];
+
+  const urls = {
+  Twitter: 'https://twitter.com/blockhore',
+  Telegram: 'https://t.me/Blockhore',
+  Instagram: 'https://instagram.com/blockhore',
+  Github: 'https://github.com/blockhore',
+  LinkedIn: 'https://linkedin.com/company/blockchore',
+}
 
   return (
     <div className={`min-h-screen pt-20 ${
@@ -359,12 +368,16 @@ export const AboutPage: React.FC<AboutPageProps> = ({ isDark }) => {
                 <div className="flex justify-center gap-6">
                   {[
                     { icon: Twitter, label: 'Twitter' },
-                    { icon: MessageCircle, label: 'Discord' },
+                    { icon: Send, label: 'Telegram' },
+                    { icon: Instagram, label: 'Instagram' },
                     { icon: Github, label: 'Github' },
                     { icon: Linkedin, label: 'LinkedIn' }
                   ].map(({ icon: Icon, label }) => (
-                    <button
+                    <a
                       key={label}
+                      href={urls[label]}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className={`p-3 rounded-full border-2 transition-all duration-300 hover:scale-110 ${
                         isDark 
                           ? 'border-amber-400/20 hover:border-amber-400 hover:bg-amber-400/10' 
@@ -374,7 +387,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ isDark }) => {
                       <Icon className={`w-5 h-5 ${
                         isDark ? 'text-amber-400' : 'text-purple-600'
                       }`} />
-                    </button>
+                    </a>
                   ))}
                 </div>
                 
