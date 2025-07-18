@@ -91,31 +91,35 @@ export const CommunityOrb: React.FC<CommunityOrbProps> = ({ isDark }) => {
               </div>
 
               <div className="space-y-3">
-                {['Discord', 'Telegram', 'Twitter'].map((platform) => (
-                  const url = (
-                    Discord: 'https://blockhore.vercel.app/404',
-                    Telegram: 'https://t.me/Blockhore',
-                    Twitter: 'https://x.com/Blockhore',
-                    )
-
+                {['Discord', 'Telegram', 'Twitter'].map((platform) => {
+                  const urls = {
+                    Discord: 'https://discord.gg/your-invite-code',
+                    Telegram: 'https://t.me/your-channel',
+                    Twitter: 'https://twitter.com/yourhandle',
+                  }
+              
                   return (
-                  <button
-                    key={platform}
-                    className={`w-full p-3 rounded border-2 transition-all duration-200 ${
-                      isDark 
-                        ? 'border-amber-400/20 hover:border-amber-400/50 hover:bg-amber-400/5' 
-                        : 'border-purple-600/20 hover:border-purple-600/50 hover:bg-purple-600/5'
-                    }`}
-                  >
-                    <span className={`font-mono text-sm ${
-                      isDark ? 'text-amber-400' : 'text-purple-600'
-                    }`}>
-                      {'>'} join.{platform.toLowerCase()}()
-                    </span>
-                  </button>
+                    <a
+                      key={platform}
+                      href={urls[platform]}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`block w-full p-3 rounded border-2 transition-all duration-200 ${
+                        isDark 
+                          ? 'border-amber-400/20 hover:border-amber-400/50 hover:bg-amber-400/5' 
+                          : 'border-purple-600/20 hover:border-purple-600/50 hover:bg-purple-600/5'
+                      }`}
+                    >
+                      <span className={`font-mono text-sm ${
+                        isDark ? 'text-amber-400' : 'text-purple-600'
+                      }`}>
+                        {'>'} join.{platform.toLowerCase()}()
+                      </span>
+                    </a>
                   )
-                ))}
+                })}
               </div>
+
 
               <button
                 className={`w-full p-3 rounded ${
