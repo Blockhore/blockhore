@@ -169,9 +169,7 @@ function App() {
                     Orbiting Education. Attracting Innovation.
                   </div>
                 
-                  <button 
-                    onClick={scrollToFeatureModules}
-                    className={`px-8 py-4 rounded-lg font-mono text-lg transition-all duration-300 hover:scale-105 ${
+                  <button className={`px-8 py-4 rounded-lg font-mono text-lg transition-all duration-300 hover:scale-105 ${
                     isDark 
                       ? 'bg-amber-400 text-black hover:bg-amber-400/90' 
                       : 'bg-purple-600 text-white hover:bg-purple-600/90'
