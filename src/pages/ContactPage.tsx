@@ -241,7 +241,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ isDark }) => {
                 style={{ animationDuration: '2s' }}
               >
                 <span>{'>'} send.message()</span>
-                <Send className="w-5 h-5" />
+                
               </button>
             </div>
                         {/* Right Illustration */}
@@ -419,7 +419,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ isDark }) => {
                     ) : (
                       <>
                         <span>{'>'} submit.message()</span>
-                        <Send className="w-5 h-5" />
+                        
                       </>
                     )}
                   </button>
