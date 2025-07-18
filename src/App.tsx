@@ -292,9 +292,21 @@ function App() {
                     { icon: Instagram, label: 'Instagram' },
                     { icon: Github, label: 'Github' },
                     { icon: Linkedin, label: 'LinkedIn' }
+
+                    const urls = {
+                      Twitter: 'https://twitter.com/yourhandle',
+                      Telegram: 'https://t.me/yourchannel',
+                      Instagram: 'https://instagram.com/yourprofile',
+                      Github: 'https://github.com/yourrepo',
+                      LinkedIn: 'https://linkedin.com/in/yourprofile',
+                    }
+            
                   ].map(({ icon: Icon, label }) => (
-                    <button
+                    <a
                       key={label}
+                      href={urls[label]}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className={`p-3 rounded-full border-2 transition-all duration-300 hover:scale-110 ${
                         isDark 
                           ? 'border-amber-400/20 hover:border-amber-400 hover:bg-amber-400/10' 
@@ -304,7 +316,7 @@ function App() {
                       <Icon className={`w-5 h-5 ${
                         isDark ? 'text-amber-400' : 'text-purple-600'
                       }`} />
-                    </button>
+                    </a>
                   ))}
                 </div>
                 
