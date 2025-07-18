@@ -120,12 +120,12 @@ export const ContactPage: React.FC<ContactPageProps> = ({ isDark }) => {
     {
       icon: Mail,
       label: 'Email',
-      handle: 'contact@blockhore.xyz',
-      href: 'mailto:contact@blockhore.xyz',
+      handle: 'blockhore.team@gmail.com',
+      href: 'mailto:blockhore.team@gmail.com',
       color: 'from-blue-500 to-cyan-500'
     },
     {
-      icon: MessageCircle,
+      icon: Send,
       label: 'Telegram',
       handle: '@blockhore',
       href: 'https://t.me/blockhore',
@@ -141,8 +141,8 @@ export const ContactPage: React.FC<ContactPageProps> = ({ isDark }) => {
     {
       icon: Instagram,
       label: 'Instagram',
-      handle: '@blockhore.xyz',
-      href: 'https://instagram.com/blockhore.xyz',
+      handle: '@blockhore',
+      href: 'https://instagram.com/blockhore',
       color: 'from-pink-500 to-purple-600'
     }
   ];
