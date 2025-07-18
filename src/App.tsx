@@ -114,6 +114,15 @@ function App() {
     }
   ];
 
+  const urls = {
+  Twitter: 'https://x.com/Blockhore',
+  Telegram: 'https://t.me/Blockhore',
+  Instagram: 'https://instagram.com/blockhore',
+  Github: 'https://github.com/blockhore',
+  LinkedIn: 'https://www.linkedin.com/company/blockhore/',
+}
+
+
   return (
     <Router>
       {/* Loading Screen */}
@@ -292,15 +301,6 @@ function App() {
                     { icon: Instagram, label: 'Instagram' },
                     { icon: Github, label: 'Github' },
                     { icon: Linkedin, label: 'LinkedIn' }
-
-                    const urls = {
-                      Twitter: 'https://twitter.com/yourhandle',
-                      Telegram: 'https://t.me/yourchannel',
-                      Instagram: 'https://instagram.com/yourprofile',
-                      Github: 'https://github.com/yourrepo',
-                      LinkedIn: 'https://linkedin.com/in/yourprofile',
-                    }
-            
                   ].map(({ icon: Icon, label }) => (
                     <a
                       key={label}
