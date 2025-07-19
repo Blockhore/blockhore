@@ -15,144 +15,37 @@ import {
   Eye,
   ChevronUp,
   Github,
+  AlertCircle,
+  BookOpen
 } from 'lucide-react';
+import { marked } from 'marked';
+import matter from 'gray-matter';
 
 interface BlogPostPageProps {
   isDark: boolean;
 }
 
+interface PostData {
+  title: string;
+  date: string;
+  author: string;
+  tags: string[];
+  description: string;
+}
+
+interface PostContent {
+  data: PostData;
+  content: string;
+}
+
 export const BlogPostPage: React.FC<BlogPostPageProps> = ({ isDark }) => {
   const { slug } = useParams();
+  const [post, setPost] = useState<PostContent | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showCopiedToast, setShowCopiedToast] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-
-  // Mock article data - in real app, this would come from API/CMS
-  const article = {
-    id: 1,
-    slug: 'understanding-ethereum-staking-rewards',
-    title: 'Understanding Ethereum 2.0 Staking Rewards',
-    subtitle: 'Deep dive into ETH staking mechanisms, rewards calculation, and validator requirements for maximum yield optimization.',
-    heroImage: 'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg?auto=compress&cs=tinysrgb&w=1200',
-    author: {
-      name: 'Alex Chen',
-      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100',
-      bio: 'DeFi researcher and blockchain developer'
-    },
-    publishDate: '2025-01-15',
-    readTime: '8 min',
-    category: 'DeFi',
-    tags: ['ethereum', 'staking', 'defi', 'rewards', 'validator'],
-    views: 1247,
-    content: `
-# Introduction to Ethereum Staking
-
-Ethereum 2.0 has revolutionized the way we think about blockchain consensus mechanisms. The transition from Proof of Work to Proof of Stake has opened up new opportunities for token holders to participate in network security while earning rewards.
-
-## How Staking Works
-
-Staking involves locking up your ETH tokens to become a validator on the Ethereum network. Validators are responsible for:
-
-- Processing transactions
-- Creating new blocks
-- Maintaining network security
-- Earning rewards for honest behavior
-
-### Minimum Requirements
-
-To become a validator, you need:
-
-1. **32 ETH minimum** - This is the base requirement for running a validator node
-2. **Technical setup** - Running validator software 24/7
-3. **Slashing risk awareness** - Understanding penalties for malicious behavior
-
-> "Staking is not just about earning rewards; it's about securing the future of decentralized finance." - Vitalik Buterin
-
-## Reward Calculation
-
-The staking rewards are calculated based on several factors:
-
-\`\`\`javascript
-const calculateRewards = (stakedAmount, networkParticipation, uptime) => {
-  const baseReward = stakedAmount * 0.05; // 5% base APR
-  const participationBonus = baseReward * (networkParticipation / 100);
-  const uptimeMultiplier = uptime / 100;
-  
-  return (baseReward + participationBonus) * uptimeMultiplier;
-};
-\`\`\`
-
-### Current Reward Rates
-
-As of January 2025, the average staking rewards are:
-
-- **Solo staking**: 4.2% - 5.8% APR
-- **Liquid staking**: 3.8% - 5.2% APR
-- **Centralized exchanges**: 3.5% - 4.8% APR
-
-## Risks and Considerations
-
-While staking can be profitable, there are several risks to consider:
-
-### Slashing Conditions
-
-Validators can lose part of their stake if they:
-
-- Go offline for extended periods
-- Submit conflicting attestations
-- Propose invalid blocks
-
-### Liquidity Considerations
-
-When you stake ETH directly:
-
-- Funds are locked until withdrawals are enabled
-- No immediate access to your staked tokens
-- Opportunity cost of not using ETH elsewhere
-
-## Liquid Staking Solutions
-
-Liquid staking protocols like Lido and Rocket Pool offer alternatives:
-
-- **Immediate liquidity** through derivative tokens
-- **Lower barriers to entry** (no 32 ETH minimum)
-- **Professional validation** services
-
-## Conclusion
-
-Ethereum staking represents a fundamental shift in how blockchain networks achieve consensus. While the rewards can be attractive, it's essential to understand the technical requirements, risks, and various staking options available.
-
-The future of Ethereum depends on a robust validator network, and staking provides an opportunity for token holders to contribute to this vision while earning rewards.
-    `
-  };
-
-  const relatedPosts = [
-    {
-      id: 2,
-      title: 'DeFi Yield Farming Strategies 2025',
-      excerpt: 'Latest yield farming opportunities and risk assessment techniques.',
-      thumbnail: 'https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg?auto=compress&cs=tinysrgb&w=400',
-      date: '2025-01-12',
-      readTime: '10 min'
-    },
-    {
-      id: 3,
-      title: 'Layer 2 Scaling Solutions Comparison',
-      excerpt: 'Technical analysis of Arbitrum, Optimism, and Polygon performance.',
-      thumbnail: 'https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&w=400',
-      date: '2025-01-13',
-      readTime: '15 min'
-    },
-    {
-      id: 4,
-      title: 'Smart Contract Security Best Practices',
-      excerpt: 'Essential security patterns and audit checklist for developers.',
-      thumbnail: 'https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg?auto=compress&cs=tinysrgb&w=400',
-      date: '2025-01-10',
-      readTime: '18 min'
-    }
-  ];
-
-  const sidebarTags = ['ethereum', 'staking', 'defi', 'rewards', 'validator', 'pos', 'consensus'];
+  const [relatedPosts, setRelatedPosts] = useState<any[]>([]);
 
   // Handle scroll events
   useEffect(() => {
@@ -163,6 +56,89 @@ The future of Ethereum depends on a robust validator network, and staking provid
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Load markdown post
+  useEffect(() => {
+    const loadPost = async () => {
+      if (!slug) return;
+      
+      setLoading(true);
+      setError(null);
+      
+      try {
+        // Use dynamic import to load markdown files
+        const posts = import.meta.glob('/src/posts/*.md', { as: 'raw' });
+        const postPath = `/src/posts/${slug}.md`;
+        
+        if (!(postPath in posts)) {
+          setError('Post not found');
+          setLoading(false);
+          return;
+        }
+        
+        const markdownContent = await posts[postPath]();
+        const { data, content } = matter(markdownContent);
+        
+        setPost({
+          data: data as PostData,
+          content: marked(content)
+        });
+        
+        // Load related posts
+        await loadRelatedPosts(data.tags || []);
+      } catch (err) {
+        console.error('Error loading post:', err);
+        setError('Failed to load post');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPost();
+  }, [slug]);
+
+  // Load related posts based on tags
+  const loadRelatedPosts = async (currentTags: string[]) => {
+    try {
+      const posts = import.meta.glob('/src/posts/*.md', { as: 'raw' });
+      const allPosts = [];
+      
+      for (const [path, loader] of Object.entries(posts)) {
+        const postSlug = path.split('/').pop()?.replace('.md', '');
+        if (postSlug === slug) continue; // Skip current post
+        
+        const markdownContent = await loader();
+        const { data } = matter(markdownContent);
+        
+        // Calculate relevance score based on shared tags
+        const sharedTags = (data.tags || []).filter((tag: string) => 
+          currentTags.includes(tag)
+        );
+        
+        if (sharedTags.length > 0) {
+          allPosts.push({
+            slug: postSlug,
+            title: data.title,
+            description: data.description,
+            author: data.author,
+            date: data.date,
+            tags: data.tags || [],
+            sharedTags,
+            relevanceScore: sharedTags.length
+          });
+        }
+      }
+      
+      // Sort by relevance score and take top 3
+      const sortedPosts = allPosts
+        .sort((a, b) => b.relevanceScore - a.relevanceScore)
+        .slice(0, 3);
+      
+      setRelatedPosts(sortedPosts);
+    } catch (err) {
+      console.error('Error loading related posts:', err);
+    }
+  };
 
   // Copy link functionality
   const copyLink = async () => {
@@ -182,7 +158,8 @@ The future of Ethereum depends on a robust validator network, and staking provid
 
   // Share functions
   const shareToTwitter = () => {
-    const text = `Check out this article: ${article.title}`;
+    if (!post) return;
+    const text = `Check out this article: ${post.data.title}`;
     const url = window.location.href;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
   };
@@ -192,42 +169,62 @@ The future of Ethereum depends on a robust validator network, and staking provid
     window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
   };
 
-  // Render markdown content (simplified - in real app, use a proper markdown parser)
-  const renderContent = (content: string) => {
-    return content.split('\n').map((line, index) => {
-      if (line.startsWith('# ')) {
-        return <h1 key={index} className={`text-3xl font-bold mb-6 mt-8 font-mono ${isDark ? 'text-amber-400' : 'text-purple-600'}`}>{line.slice(2)}</h1>;
-      }
-      if (line.startsWith('## ')) {
-        return <h2 key={index} className={`text-2xl font-bold mb-4 mt-6 font-mono ${isDark ? 'text-amber-400' : 'text-purple-600'}`}>{line.slice(3)}</h2>;
-      }
-      if (line.startsWith('### ')) {
-        return <h3 key={index} className={`text-xl font-bold mb-3 mt-5 font-mono ${isDark ? 'text-amber-400' : 'text-purple-600'}`}>{line.slice(4)}</h3>;
-      }
-      if (line.startsWith('> ')) {
-        return (
-          <blockquote key={index} className={`border-l-4 pl-4 py-2 my-4 italic ${
-            isDark ? 'border-amber-400/50 bg-amber-400/5 text-white/80' : 'border-purple-600/50 bg-purple-600/5 text-black/80'
+  // Loading state
+  if (loading) {
+    return (
+      <div className={`min-h-screen pt-20 ${
+        isDark ? 'bg-black text-white' : 'bg-white text-black'
+      }`}>
+        <div className="max-w-4xl mx-auto px-6 py-20 text-center">
+          <div className={`inline-flex items-center gap-3 p-4 rounded-lg ${
+            isDark 
+              ? 'bg-amber-400/20 text-amber-400' 
+              : 'bg-purple-600/20 text-purple-600'
+          } animate-pulse`}>
+            <div className="w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            <span className="font-mono">Loading post...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !post) {
+    return (
+      <div className={`min-h-screen pt-20 ${
+        isDark ? 'bg-black text-white' : 'bg-white text-black'
+      }`}>
+        <div className="max-w-4xl mx-auto px-6 py-20 text-center">
+          <div className={`inline-flex items-center gap-3 p-6 rounded-lg border-2 ${
+            isDark 
+              ? 'border-red-400/50 bg-red-400/10 text-red-400' 
+              : 'border-red-600/50 bg-red-600/10 text-red-600'
           }`}>
-            {line.slice(2)}
-          </blockquote>
-        );
-      }
-      if (line.startsWith('```')) {
-        return null; // Handle code blocks separately
-      }
-      if (line.match(/^\d+\./)) {
-        return <li key={index} className={`mb-2 ${isDark ? 'text-white/90' : 'text-black/90'}`}>{line.replace(/^\d+\.\s*/, '')}</li>;
-      }
-      if (line.startsWith('- ')) {
-        return <li key={index} className={`mb-2 ${isDark ? 'text-white/90' : 'text-black/90'}`}>{line.slice(2)}</li>;
-      }
-      if (line.trim() === '') {
-        return <br key={index} />;
-      }
-      return <p key={index} className={`mb-4 leading-relaxed ${isDark ? 'text-white/90' : 'text-black/90'}`}>{line}</p>;
-    });
-  };
+            <AlertCircle className="w-8 h-8" />
+            <div>
+              <h2 className="text-xl font-bold font-mono mb-2">Post.NotFound()</h2>
+              <p className="text-sm">The article you're looking for doesn't exist in our knowledge base.</p>
+            </div>
+          </div>
+          
+          <div className="mt-8">
+            <Link
+              to="/blog"
+              className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg border-2 font-mono text-sm transition-all duration-300 hover:scale-105 ${
+                isDark 
+                  ? 'border-amber-400/20 text-amber-400 hover:border-amber-400 hover:bg-amber-400/10' 
+                  : 'border-purple-600/20 text-purple-600 hover:border-purple-600 hover:bg-purple-600/10'
+              }`}
+            >
+              <ArrowLeft className="w-4 h-4" />
+              back.to.blog()
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen pt-20 ${
@@ -251,28 +248,19 @@ The future of Ethereum depends on a robust validator network, and staking provid
 
       {/* Hero Section */}
       <section className="max-w-4xl mx-auto px-6 mb-12">
-        {/* Hero Image */}
-        <div className="mb-8 rounded-lg overflow-hidden">
-          <img
-            src={article.heroImage}
-            alt={article.title}
-            className="w-full h-64 md:h-96 object-cover filter grayscale hover:grayscale-0 transition-all duration-500"
-          />
-        </div>
-
         {/* Title */}
         <div className="text-center mb-8">
           <h1 className={`text-3xl md:text-5xl font-bold mb-4 font-mono terminal-glow ${
             isDark ? 'text-amber-400' : 'text-purple-600'
           }`}>
-            {article.title}
+            {post.data.title}
           </h1>
           
-          {article.subtitle && (
+          {post.data.description && (
             <p className={`text-lg md:text-xl mb-6 max-w-3xl mx-auto ${
               isDark ? 'text-white/80' : 'text-black/80'
             }`}>
-              {article.subtitle}
+              {post.data.description}
             </p>
           )}
         </div>
@@ -281,39 +269,33 @@ The future of Ethereum depends on a robust validator network, and staking provid
         <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 mb-8">
           {/* Author */}
           <div className="flex items-center gap-3">
-            <img
-              src={article.author.avatar}
-              alt={article.author.name}
-              className="w-10 h-10 rounded-full"
-            />
+            <div className={`w-10 h-10 rounded-full ${
+              isDark ? 'bg-amber-400/20' : 'bg-purple-600/20'
+            } flex items-center justify-center`}>
+              <User className={`w-5 h-5 ${
+                isDark ? 'text-amber-400' : 'text-purple-600'
+              }`} />
+            </div>
             <div>
               <div className={`font-medium ${isDark ? 'text-white' : 'text-black'}`}>
-                {article.author.name}
+                {post.data.author}
               </div>
               <div className={`text-xs ${isDark ? 'text-white/60' : 'text-black/60'}`}>
-                {article.author.bio}
+                Author
               </div>
             </div>
           </div>
 
-          {/* Date & Read Time */}
+          {/* Date */}
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-1">
               <Calendar className={`w-4 h-4 ${isDark ? 'text-white/50' : 'text-black/50'}`} />
               <span className={`${isDark ? 'text-white/70' : 'text-black/70'}`}>
-                {article.publishDate}
-              </span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Clock className={`w-4 h-4 ${isDark ? 'text-white/50' : 'text-black/50'}`} />
-              <span className={`${isDark ? 'text-white/70' : 'text-black/70'}`}>
-                {article.readTime} read
-              </span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Eye className={`w-4 h-4 ${isDark ? 'text-white/50' : 'text-black/50'}`} />
-              <span className={`${isDark ? 'text-white/70' : 'text-black/70'}`}>
-                {article.views}
+                {new Date(post.data.date).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
               </span>
             </div>
           </div>
@@ -321,14 +303,7 @@ The future of Ethereum depends on a robust validator network, and staking provid
 
         {/* Tags */}
         <div className="flex flex-wrap justify-center gap-2 mb-8">
-          <span className={`px-3 py-1 rounded-full text-sm font-mono ${
-            isDark 
-              ? 'bg-amber-400 text-black' 
-              : 'bg-purple-600 text-white'
-          }`}>
-            {article.category}
-          </span>
-          {article.tags.map((tag) => (
+          {post.data.tags.map((tag) => (
             <span
               key={tag}
               className={`px-3 py-1 rounded-full text-sm ${
@@ -350,11 +325,14 @@ The future of Ethereum depends on a robust validator network, and staking provid
           {/* Article Content */}
           <main className="flex-1 max-w-none lg:max-w-3xl">
             <article className={`prose prose-lg max-w-none ${
-              isDark ? 'prose-invert' : ''
+              isDark 
+                ? 'prose-invert prose-amber prose-headings:text-amber-400 prose-links:text-amber-400 prose-code:text-amber-400' 
+                : 'prose-purple prose-headings:text-purple-600 prose-links:text-purple-600 prose-code:text-purple-600'
             }`}>
-              <div className="text-lg leading-relaxed">
-                {renderContent(article.content)}
-              </div>
+              <div 
+                className="markdown-content"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
             </article>
           </main>
 
@@ -362,6 +340,74 @@ The future of Ethereum depends on a robust validator network, and staking provid
           <aside className="hidden lg:block lg:w-80">
             <div className="sticky top-24 space-y-6">
               
+              {/* Related Posts */}
+              {relatedPosts.length > 0 && (
+                <div className={`p-6 rounded-lg border-2 ${
+                  isDark 
+                    ? 'border-amber-400/20 bg-black/40' 
+                    : 'border-purple-600/20 bg-white/40'
+                } backdrop-blur-sm`}>
+                  <div className="flex items-center gap-2 mb-4">
+                    <BookOpen className={`w-4 h-4 ${
+                      isDark ? 'text-amber-400' : 'text-purple-600'
+                    }`} />
+                    <h3 className={`font-mono text-sm ${
+                      isDark ? 'text-amber-400' : 'text-purple-600'
+                    }`}>
+                      related.posts()
+                    </h3>
+                  </div>
+                  <div className="space-y-3">
+                    {relatedPosts.map((relatedPost) => (
+                      <Link
+                        key={relatedPost.slug}
+                        to={`/post/${relatedPost.slug}`}
+                        className={`block p-3 rounded border transition-all duration-200 hover:scale-105 ${
+                          isDark 
+                            ? 'border-amber-400/10 hover:border-amber-400/30 hover:bg-amber-400/5' 
+                            : 'border-purple-600/10 hover:border-purple-600/30 hover:bg-purple-600/5'
+                        }`}
+                      >
+                        <h4 className={`text-sm font-medium mb-2 ${
+                          isDark ? 'text-white' : 'text-black'
+                        } line-clamp-2`}>
+                          {relatedPost.title}
+                        </h4>
+                        <div className="flex items-center justify-between text-xs mb-2">
+                          <span className={`${
+                            isDark ? 'text-white/50' : 'text-black/50'
+                          }`}>
+                            {relatedPost.author}
+                          </span>
+                          <span className={`${
+                            isDark ? 'text-white/50' : 'text-black/50'
+                          }`}>
+                            {new Date(relatedPost.date).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric'
+                            })}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {relatedPost.sharedTags.slice(0, 2).map((tag: string) => (
+                            <span
+                              key={tag}
+                              className={`text-xs px-2 py-1 rounded-full ${
+                                isDark 
+                                  ? 'bg-amber-400/20 text-amber-400' 
+                                  : 'bg-purple-600/20 text-purple-600'
+                              }`}
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Tags */}
               <div className={`p-6 rounded-lg border-2 ${
                 isDark 
@@ -379,7 +425,7 @@ The future of Ethereum depends on a robust validator network, and staking provid
                   </h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {sidebarTags.map((tag) => (
+                  {post.data.tags.map((tag) => (
                     <button
                       key={tag}
                       className={`text-xs px-3 py-2 rounded-full border transition-all duration-200 hover:scale-105 ${
@@ -553,6 +599,7 @@ The future of Ethereum depends on a robust validator network, and staking provid
           </div>
         </div>
       </section>
+      )}
 
       {/* Mobile Sticky Bottom Bar */}
       <div className={`lg:hidden fixed bottom-0 left-0 right-0 ${
@@ -620,7 +667,7 @@ The future of Ethereum depends on a robust validator network, and staking provid
           Link copied!
         </div>
       )}
-      
+
     </div>
   );
 };
