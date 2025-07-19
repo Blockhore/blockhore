@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      buffer: 'buffer/',  // perhatikan slash '/' di akhir supaya resolve ke package dengan benar
+      buffer: 'buffer', 
       process: 'process/browser',
     },
   },
