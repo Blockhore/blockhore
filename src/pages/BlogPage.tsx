@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter, ChevronLeft, ChevronRight, Clock, User, Eye, Tag, TrendingUp, Calendar, Twitter, MessageCircle, Github, Linkedin, Instagram, Send, } from 'lucide-react';
+import { Search, Filter, ChevronLeft, ChevronRight, Clock, User, Eye, Tag, TrendingUp, Calendar, Twitter, MessageCircle, Github, Linkedin, } from 'lucide-react';
 
 interface BlogPageProps {
   isDark: boolean;
@@ -41,27 +41,29 @@ export const BlogPage: React.FC<BlogPageProps> = ({ isDark }) => {
   const articles = [
     {
       id: 1,
-      title: 'Understanding Ethereum 2.0 Staking Rewards',
-      excerpt: 'Deep dive into ETH staking mechanisms, rewards calculation, and validator requirements for maximum yield.',
+      title: 'Blockchain dan Ekonomi Syariah',
+      excerpt: 'Menelusuri hubungan antara teknologi blockchain dan prinsip ekonomi syariah.',
       category: 'defi',
-      author: 'Alex Chen',
-      date: '2025-01-15',
+      author: 'Rafi Aliffari',
+      date: '2025-07-16',
       readTime: '8 min',
       views: 1247,
       thumbnail: 'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg?auto=compress&cs=tinysrgb&w=400',
-      tags: ['ethereum', 'staking', 'defi']
+      tags: ['blockchain', 'ekonomi syariah'],
+      slug: 'blockchain-dan-ekonomi-syariah'
     },
     {
       id: 2,
-      title: 'NFT Marketplace Analysis: OpenSea vs Blur',
-      excerpt: 'Comprehensive comparison of leading NFT marketplaces, fees, features, and trading volume analysis.',
+      title: 'DeFi Yield Farming Strategies 2025',
+      excerpt: 'Latest yield farming opportunities, risk assessment, and portfolio optimization techniques for 2025.',
       category: 'nft',
-      author: 'Sarah Kim',
-      date: '2025-01-14',
+      author: 'Emma Thompson',
+      date: '2025-01-12',
       readTime: '12 min',
       views: 892,
       thumbnail: 'https://images.pexels.com/photos/7567443/pexels-photo-7567443.jpeg?auto=compress&cs=tinysrgb&w=400',
-      tags: ['nft', 'marketplace', 'trading']
+      tags: ['defi', 'yield', 'farming', 'strategies'],
+      slug: 'defi-yield-farming-strategies'
     },
     {
       id: 3,
@@ -73,44 +75,9 @@ export const BlogPage: React.FC<BlogPageProps> = ({ isDark }) => {
       readTime: '15 min',
       views: 2156,
       thumbnail: 'https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&w=400',
-      tags: ['layer2', 'scaling', 'ethereum']
+      tags: ['layer2', 'scaling', 'ethereum', 'blockchain'],
+      slug: 'layer-2-scaling-solutions'
     },
-    {
-      id: 4,
-      title: 'DeFi Yield Farming Strategies 2025',
-      excerpt: 'Latest yield farming opportunities, risk assessment, and portfolio optimization techniques.',
-      category: 'defi',
-      author: 'Emma Thompson',
-      date: '2025-01-12',
-      readTime: '10 min',
-      views: 1543,
-      thumbnail: 'https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg?auto=compress&cs=tinysrgb&w=400',
-      tags: ['defi', 'yield', 'farming']
-    },
-    {
-      id: 5,
-      title: 'Web3 Gaming: Play-to-Earn Revolution',
-      excerpt: 'Exploring the future of blockchain gaming, tokenomics, and sustainable play-to-earn models.',
-      category: 'nft',
-      author: 'David Park',
-      date: '2025-01-11',
-      readTime: '7 min',
-      views: 967,
-      thumbnail: 'https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=400',
-      tags: ['gaming', 'web3', 'p2e']
-    },
-    {
-      id: 6,
-      title: 'Smart Contract Security Best Practices',
-      excerpt: 'Essential security patterns, common vulnerabilities, and audit checklist for smart contract developers.',
-      category: 'tech',
-      author: 'Lisa Wang',
-      date: '2025-01-10',
-      readTime: '18 min',
-      views: 1876,
-      thumbnail: 'https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg?auto=compress&cs=tinysrgb&w=400',
-      tags: ['security', 'smart-contracts', 'development']
-    }
   ];
 
   const popularTags = [
@@ -142,14 +109,6 @@ export const BlogPage: React.FC<BlogPageProps> = ({ isDark }) => {
   const totalPages = Math.ceil(filteredArticles.length / articlesPerPage);
   const startIndex = (currentPage - 1) * articlesPerPage;
   const paginatedArticles = filteredArticles.slice(startIndex, startIndex + articlesPerPage);
-
-  const urls = {
-  Twitter: 'https://twitter.com/Blockhore',
-  Telegram: 'https://t.me/Blockhore',
-  Instagram: 'https://instagram.com/blockhore',
-  Github: 'https://github.com/blockhore',
-  LinkedIn: 'https://linkedin.com/company/blockhore',
-};
 
   return (
     <div className={`min-h-screen pt-20 ${
@@ -283,7 +242,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ isDark }) => {
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <Link 
-                      to={`/blog/${article.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')}`}
+                      to={`/post/${article.slug}`}
                       className="block"
                     >
                     {/* Thumbnail */}
@@ -548,16 +507,12 @@ export const BlogPage: React.FC<BlogPageProps> = ({ isDark }) => {
           <div className="flex justify-center gap-6">
             {[
               { icon: Twitter, label: 'Twitter' },
-              { icon: Send, label: 'Telegram' },
-              { icon: Instagram, label: 'Instagram' },
+              { icon: MessageCircle, label: 'Discord' },
               { icon: Github, label: 'Github' },
               { icon: Linkedin, label: 'LinkedIn' }
             ].map(({ icon: Icon, label }) => (
-              <a
+              <button
                 key={label}
-                href={urls[label]}
-                target="_blank"
-                rel="noopener noreferrer"
                 className={`p-3 rounded-full border-2 transition-all duration-300 hover:scale-110 ${
                   isDark 
                     ? 'border-amber-400/20 hover:border-amber-400 hover:bg-amber-400/10' 
@@ -567,7 +522,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ isDark }) => {
                 <Icon className={`w-5 h-5 ${
                   isDark ? 'text-amber-400' : 'text-purple-600'
                 }`} />
-              </a>
+              </button>
             ))}
           </div>
           
