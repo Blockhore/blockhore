@@ -19,7 +19,6 @@ import {
   BookOpen
 } from 'lucide-react';
 import { marked } from 'marked';
-import matter from 'gray-matter';
 
 interface BlogPostPageProps {
   isDark: boolean;
