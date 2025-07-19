@@ -599,7 +599,7 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ isDark }) => {
           </div>
         </div>
       </section>
-      )}
+      
 
       {/* Mobile Sticky Bottom Bar */}
       <div className={`lg:hidden fixed bottom-0 left-0 right-0 ${
