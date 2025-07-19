@@ -5,7 +5,7 @@ import App from './App.tsx';
 import './index.css';
 
 // Make Buffer available globally for browser compatibility
-window.Buffer = Buffer;
+(window as any).Buffer = Buffer;
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
