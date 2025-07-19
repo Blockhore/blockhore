@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sun, Moon, BookOpen, Users, Zap, Globe, Twitter, MessageCircle, Github, Linkedin, Instagram, Send } from 'lucide-react';
+import { Sun, Moon, BookOpen, Users, Zap, Globe, Twitter, MessageCircle, Github, Linkedin } from 'lucide-react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { LoadingScreen } from './components/LoadingScreen';
@@ -113,15 +113,6 @@ function App() {
       icon: Globe
     }
   ];
-
-  const urls = {
-  Twitter: 'https://x.com/Blockhore',
-  Telegram: 'https://t.me/Blockhore',
-  Instagram: 'https://instagram.com/blockhore',
-  Github: 'https://github.com/blockhore',
-  LinkedIn: 'https://www.linkedin.com/company/blockhore/',
-}
-
 
   return (
     <Router>
@@ -297,16 +288,12 @@ function App() {
                 <div className="flex justify-center gap-6">
                   {[
                     { icon: Twitter, label: 'Twitter' },
-                    { icon: Send, label: 'Telegram' },
-                    { icon: Instagram, label: 'Instagram' },
+                    { icon: MessageCircle, label: 'Discord' },
                     { icon: Github, label: 'Github' },
                     { icon: Linkedin, label: 'LinkedIn' }
                   ].map(({ icon: Icon, label }) => (
-                    <a
+                    <button
                       key={label}
-                      href={urls[label]}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       className={`p-3 rounded-full border-2 transition-all duration-300 hover:scale-110 ${
                         isDark 
                           ? 'border-amber-400/20 hover:border-amber-400 hover:bg-amber-400/10' 
@@ -316,7 +303,7 @@ function App() {
                       <Icon className={`w-5 h-5 ${
                         isDark ? 'text-amber-400' : 'text-purple-600'
                       }`} />
-                    </a>
+                    </button>
                   ))}
                 </div>
                 
@@ -338,7 +325,7 @@ function App() {
             <BlogPage isDark={isDark} />
           </>
         } />
-        <Route path="/blog/:slug" element={
+        <Route path="/post/:slug" element={
           <>
             <Navbar isDark={isDark} onToggleTheme={() => setIsDark(!isDark)} />
             <BlogPostPage isDark={isDark} />
